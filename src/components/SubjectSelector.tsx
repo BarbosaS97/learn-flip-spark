@@ -1,22 +1,16 @@
 import React, { useState } from 'react';
-import { Check, Play, BookOpen, ArrowLeft } from 'lucide-react';
+import { Check, Play, BookOpen } from 'lucide-react';
 import { Subject } from '@/data/flashcards';
-import { useStudy } from '@/contexts/StudyContext';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 
 interface SubjectSelectorProps {
   subjects: Subject[];
   onStartStudy: (selectedSubjects: Subject[]) => void;
-  onBack?: () => void;
 }
 
-export const SubjectSelector: React.FC<SubjectSelectorProps> = ({ subjects, onStartStudy, onBack }) => {
+export const SubjectSelector: React.FC<SubjectSelectorProps> = ({ subjects, onStartStudy }) => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const { currentStudy } = useStudy();
-  
-  // Use subjects from current study if available
-  const availableSubjects = currentStudy ? currentStudy.subjects : subjects;
 
   const toggleSubject = (subjectId: string) => {
     setSelectedSubjects(prev => 
@@ -27,42 +21,34 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({ subjects, onSt
   };
 
   const handleStartStudy = () => {
-    const selected = availableSubjects.filter(subject => selectedSubjects.includes(subject.id));
+    const selected = subjects.filter(subject => selectedSubjects.includes(subject.id));
     if (selected.length > 0) {
       onStartStudy(selected);
     }
   };
 
   const totalCards = selectedSubjects.reduce((total, subjectId) => {
-    const subject = availableSubjects.find(s => s.id === subjectId);
+    const subject = subjects.find(s => s.id === subjectId);
     return total + (subject?.cards.length || 0);
   }, 0);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted/30 p-4">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        {onBack && (
-          <Button onClick={onBack} variant="outline" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-        )}
-        <div className="text-center flex-1">
-          <h1 className="text-4xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
-            <BookOpen className="w-10 h-10 text-primary" />
-            {currentStudy ? currentStudy.name : 'Sistema de Flashcards'}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Selecione uma ou mais matérias para começar a estudar. Use as setas do teclado ou gestos touch para navegar.
-          </p>
-        </div>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
+          <BookOpen className="w-10 h-10 text-primary" />
+          Sistema de Flashcards
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Selecione uma ou mais matérias para começar a estudar. Use as setas do teclado ou gestos touch para navegar.
+        </p>
       </div>
 
       {/* Subject Grid */}
       <div className="flex-1 max-w-6xl mx-auto w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {availableSubjects.map((subject) => {
+          {subjects.map((subject) => {
             const isSelected = selectedSubjects.includes(subject.id);
             
             return (
