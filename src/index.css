@@ -133,7 +133,8 @@
   }
 
   .flashcard-inner {
-    @apply relative w-full h-full transition-transform duration-[var(--animation-card-flip)] transform-style-preserve-3d;
+    @apply relative w-full h-full transition-transform duration-[600ms] ease-out;
+    transform-style: preserve-3d;
   }
 
   .flashcard.flipped .flashcard-inner {
@@ -141,10 +142,10 @@
   }
 
   .flashcard-face {
-    @apply absolute inset-0 w-full h-full backface-hidden rounded-2xl p-6 flex items-center justify-center text-center;
+    @apply absolute inset-0 w-full h-full rounded-2xl p-6 flex items-center justify-center text-center transition-shadow duration-300;
     background: var(--gradient-card);
     box-shadow: var(--shadow-card);
-    transition: box-shadow var(--animation-smooth);
+    backface-visibility: hidden;
   }
 
   .flashcard:hover .flashcard-face {
