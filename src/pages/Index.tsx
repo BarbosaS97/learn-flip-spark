@@ -1,13 +1,38 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import { subjects, Subject } from '@/data/flashcards';
+import { SubjectSelector } from '@/components/SubjectSelector';
+import { FlashcardView } from '@/components/FlashcardView';
+
+type ViewMode = 'selection' | 'study';
 
 const Index = () => {
+  const [viewMode, setViewMode] = useState<ViewMode>('selection');
+  const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
+
+  const handleStartStudy = (subjects: Subject[]) => {
+    setSelectedSubjects(subjects);
+    setViewMode('study');
+  };
+
+  const handleBackToSelection = () => {
+    setViewMode('selection');
+    setSelectedSubjects([]);
+  };
+
+  if (viewMode === 'study') {
+    return (
+      <FlashcardView 
+        subjects={selectedSubjects} 
+        onBack={handleBackToSelection}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <SubjectSelector 
+      subjects={subjects} 
+      onStartStudy={handleStartStudy}
+    />
   );
 };
 
