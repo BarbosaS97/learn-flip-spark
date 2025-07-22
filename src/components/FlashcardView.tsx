@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Home } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Home, Heart } from 'lucide-react';
 import { Subject, Flashcard } from '@/data/flashcards';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useStudy } from '@/contexts/StudyContext';
 
 interface FlashcardViewProps {
   subjects: Subject[];
@@ -15,6 +16,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ subjects, onBack }
   const [isFlipped, setIsFlipped] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const isMobile = useIsMobile();
+  const { toggleFavorite, isFavorite } = useStudy();
 
   // Combine all cards from selected subjects
   const allCards = subjects.flatMap(subject => subject.cards);
@@ -157,10 +159,22 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ subjects, onBack }
                 Anterior
               </Button>
               
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-1">
-                  Use ← → para navegar | Espaço para virar
-                </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => toggleFavorite(currentCard.id.toString())}
+                  variant="outline"
+                  className={isFavorite(currentCard.id.toString()) ? 'text-red-500' : ''}
+                >
+                  <Heart className={`w-4 h-4 ${isFavorite(currentCard.id.toString()) ? 'fill-current' : ''}`} />
+                </Button>
+                
+                <Button
+                  onClick={flipCard}
+                  variant="outline"
+                  className="px-8"
+                >
+                  {isFlipped ? 'Ver Pergunta' : 'Ver Resposta'}
+                </Button>
               </div>
               
               <Button
@@ -216,9 +230,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ subjects, onBack }
 
             {/* Mobile flip indicator */}
             {isMobile && (
-              <div className="mobile-control">
-                <RotateCcw className="w-5 h-5 text-muted-foreground" />
-              </div>
+              <>
+                <div className="mobile-control">
+                  <RotateCcw className="w-5 h-5 text-muted-foreground" />
+                </div>
+                
+                {/* Favorite Control - Top Left */}
+                <div 
+                  className="absolute top-4 left-4 w-12 h-12 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-lg shadow-lg cursor-pointer"
+                  onClick={() => toggleFavorite(currentCard.id.toString())}
+                >
+                  <Heart className={`w-5 h-5 ${isFavorite(currentCard.id.toString()) ? 'fill-current text-red-500' : 'text-primary'}`} />
+                </div>
+              </>
             )}
           </div>
 
